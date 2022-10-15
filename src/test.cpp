@@ -9,6 +9,15 @@ struct salida{
 	salida(){}
 };
 
+string convert(string name){
+	string r="";
+	for(int i=0;i<name.length();i++){
+		if(name[i]!='.') r+=name[i];
+		else break;
+	}
+	return r;
+}
+
 bool rtest(vector<string>&pruebas,vector<salida>&resul,string name){
 	ifstream arch;
 	arch.open(name+".test");
@@ -63,11 +72,54 @@ long etest(string command,vector<salida>&resultado){
 	return t;
 }
 
+string analiticType(string program){
+	string extend="";
+	bool sw=false;
+	for(int i=0;i<program.length();i++){
+		if(program[i]=='.'){
+			sw=true;
+			continue;
+		}
+		if(sw) extend+=program[i];
+	}
+	return extend;
+}
+
+string pwd(){
+	FILE *arch=popen("pwd","r");
+	string text="",t="";
+	while(!feof(arch)){
+		char a=fgetc(arch);
+		if(a>=0) text+=a;
+	}
+	for(int i=0;i<text.length()-1;i++){
+		t+=text[i];
+	}
+	return t+" ";
+}
+
 string exec(string a,string program){
 	string r="echo '";
+	string ext="";
 	r+=a;
-	r+="' | ./";
-	r+=program;
+	string extend=analiticType(program);
+	if(extend=="py"){
+		r+="' | python3 ";
+		ext=".py";
+	}else if(extend=="java"){
+		r+="' | java -cp ";
+		r+=pwd();
+	}else if(extend=="lua"){
+		r+="' | lua ";
+		ext=".lua";
+	}else if(extend=="js"){
+		r+="' | node ";
+		ext=".js";
+	}else if(extend=="cs"){
+		r+="' | dotnet run ";
+	}else r+="' | ./";
+	r+=convert(program);
+	r+=ext;
 	return r;
 }
 
@@ -84,7 +136,7 @@ void showerrors(vector<salida>rc,vector<salida>rt,int t){
 				break;
 			}
 		}
-		if(rt[t].text[l].length()>rc[t].text[l].length()){
+		if(rt[t].text[l].length()>=rc[t].text[l].length()){
 			for(int ii=p;ii<rt[t].text[i].size();ii++){
 				if(ii!=rt[t].text[l].size()-1) cout<<"\033[41m"<<rt[t].text[i][ii];
 				else cout<<"\033[m"<<rt[t].text[l][ii];
@@ -108,15 +160,20 @@ int main(int arg,char *npro[]){
 	vector<string>pruebas;
 	vector<salida>rc,rt;
 	system("clear");
-	if(!rtest(pruebas,rc,npro[1])){
+	if(!rtest(pruebas,rc,convert(npro[1]))){
 		cout<<"Not found File .test\n";
 		return 0;
 	}
 	long t[pruebas.size()];
 	cout<<"-------------------------------"<<endl;
-	for(int i=0;i<pruebas.size();i++){
-
-		t[i]=etest(exec(pruebas[i],npro[1]),rt);
+	if(pruebas.size()!=0){
+		for(int i=0;i<pruebas.size();i++){
+			t[i]=etest(exec(pruebas[i],npro[1]),rt);
+		}
+	}else{
+		for(int i=0;i<rc.size();i++){
+			t[i]=etest(exec("",npro[1]),rt);
+		}
 	}
 	for(int ii=0;ii<rc.size();ii++){
 		cout<<"\033[43m\ttest #"<<ii+1<<"\033[m"<<endl;

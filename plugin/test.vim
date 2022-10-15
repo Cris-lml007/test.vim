@@ -4,7 +4,7 @@ function! TestViCompiler()
 endfunction
 
 function! TestVi()
-	execute 'sp term://'.expand(stdpath('data'). '/plugged/test.vim/src/test ').expand('%<')
+	execute 'sp term://'.expand(stdpath('data'). '/plugged/test.vim/src/test ').expand('%')
 endfunction
 
 command! TestVi call TestVi()
