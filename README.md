@@ -11,6 +11,7 @@
 A test executor for vim.  
 This plugin works as a virtual judge, it is given test cases so that it reviews which are correct and which are not.
 # ⚒️ Install  
+**This plugin has better integration with [dotfile nvim](https://github.com/Cris-lml007/dotfile-nvim/).**
 - **vim-plug**
 ```
 Plug 'Cris-lml007/test.vim'
